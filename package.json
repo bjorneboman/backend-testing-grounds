@@ -1,0 +1,27 @@
+{
+  "name": "backend-testing-grounds",
+  "version": "1.0.0",
+  "description": "A walled testing area for my course in backend development. Caution adviced! The barbed wire and the deep buffer zone are there for a reason.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bjorneboman/backend-testing-grounds.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/bjorneboman/backend-testing-grounds/issues"
+  },
+  "homepage": "https://github.com/bjorneboman/backend-testing-grounds#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
