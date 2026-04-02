@@ -4,7 +4,9 @@
   "description": "A walled testing area for my course in backend development. Caution adviced! The barbed wire and the deep buffer zone are there for a reason.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./server.js",
+    "inactive_start": "nodemon ./server.js",
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
