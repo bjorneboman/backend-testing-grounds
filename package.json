@@ -4,7 +4,10 @@
   "description": "A walled testing area for my course in backend development. Caution adviced! The barbed wire and the deep buffer zone are there for a reason.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./server.js",
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,7 +23,11 @@
   },
   "homepage": "https://github.com/bjorneboman/backend-testing-grounds#readme",
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "nodemon": "^3.1.14",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
