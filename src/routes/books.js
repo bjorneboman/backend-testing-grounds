@@ -6,7 +6,14 @@ const router = express.Router();
 // Routes
 router.post('/', async (req, res, next) => {
   try {
-    const book = await Book.create(req.body);
+    let book 
+    
+    if(Array.isArray(req.body)){
+      book = await Book.insertMany(req.body, {ordered: false});
+    } else {
+      book = await Book.create(req.body)
+    }
+
     res.status(201).json(book);
   } catch (error) {
     if(error.name === 'ValidationError') { // error.name kommer från schema-valideringen i mongoose
@@ -21,10 +28,43 @@ router.post('/', async (req, res, next) => {
 
 router.get('/', async (req, res, next) => {
   try {
-    const books = await Book.find();
-    res.json(books);
+
+    const {author, minYear, sort, page = 1, limit = 10} = req.query
+
+    const filter = {}
+
+    if(author) filter.author = author
+    const year = Number(minYear)
+    if(!isNaN(year)){
+      filter.publishYear = { $gte: year }
+    }
+
+    // Sort
+    const sortOption = sort ? sort : '-createdAt'
+
+    // Pagination
+    const pageNum = Math.max(Number(page), 1)
+    const limitNum = Math.min(Number(limit), 100)
+    const skip = (pageNum -1) * limitNum
+
+    const books = await Book.find(filter)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNum)
+
+    const total = await Book.countDocuments(filter)
+
+    res.json({
+      data: books,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
   } catch (error) {
-    next(error);
+    res.status(500).json({error: `Could not fetch books`});
   }
 });
 
