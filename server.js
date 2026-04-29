@@ -1,15 +1,21 @@
-require("dotenv").config()
+require('dotenv').config();
 
-const app = require("./src/app")
-const { connectToDB } = require("./src/config/database")
+const app = require('./src/app');
+const { connectToDatabase } = require('./src/config/database');
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-async function startServer() {
-  await connectToDB()
-  app.listen(PORT, () => {
-    console.log(`Servern lyssnar på http://localhost:${PORT}`)
-  })
+if (!MONGODB_URI) {
+  console.error(`MONGODB_URI missing in .env!`);
+  process.exit(1);
 }
 
-startServer()
+async function startServer() {
+  await connectToDatabase();
+  app.listen(PORT, () => {
+    console.log(`Server is listenting to port ${PORT}`);
+  });
+}
+
+startServer();

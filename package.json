@@ -1,30 +1,29 @@
 {
-  "name": "backend-testing-grounds",
+  "name": "books-api",
   "version": "1.0.0",
-  "description": "A walled testing area for my course in backend development. Caution adviced! The barbed wire and the deep buffer zone are there for a reason.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "nodemon ./server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bjorneboman/backend-testing-grounds.git"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch server.js",
+    "start": "tsx server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/bjorneboman/backend-testing-grounds/issues"
-  },
-  "homepage": "https://github.com/bjorneboman/backend-testing-grounds#readme",
-  "devDependencies": {
-    "nodemon": "^3.1.14"
-  },
+  "description": "",
   "dependencies": {
-    "dotenv": "^17.3.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.3.3"
+    "mongodb": "^7.2.0",
+    "mongoose": "^9.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "tsc": "^2.0.4",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
   }
 }

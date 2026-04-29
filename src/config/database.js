@@ -1,32 +1,13 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose');
 
-const MONGODB_URI = process.env.MONGODB_URI
-
-if (!MONGODB_URI) {
-  console.error("MONGODB_URI saknas i miljövariablerna!")
-  process.exit(1)
-}
-
-async function connectToDB() {
+async function connectToDatabase() {
   try {
-    await mongoose.connect(MONGODB_URI)
-    console.log("Ansluten till MongoDB")
-
-    const Game = mongoose.model(
-      "Game",
-      new mongoose.Schema({}, { strict: false }),
-      "Game",
-    )
-
-    const allGames = await Game.find()
-    console.log("Documents found:", allGames.length)
-    allGames.forEach((doc) => console.log(doc))
-
-    await mongoose.connection.close()
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to MongoDB!');
   } catch (error) {
-    console.error("Kunde inte ansluta till MongoDB:", error.message)
-    process.exit(1)
+    console.error(`Couldn't connect to MongoDb: ${error.message}`);
+    process.exit();
   }
 }
 
-module.exports = { connectToDB }
+module.exports = { connectToDatabase };
