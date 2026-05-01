@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "jest --runInBand --detectOpenHandles",
-    "dev": "tsx watch server.js",
-    "start": "tsx server.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/server.js",
+    "start": "tsx src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -15,15 +15,14 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "marked": "^18.0.2",
     "mongodb": "^7.2.0",
     "mongoose": "^9.5.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
-    "jest": "^30.3.0",
-    "mongodb-memory-server": "^11.1.0",
     "nodemon": "^3.1.14",
-    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsc": "^2.0.4",
     "tsx": "^4.21.0",

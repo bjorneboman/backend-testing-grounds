@@ -1,8 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const bookRouter = require('./routes/books');
-const authorsRouter = require('./routes/authors');
-// const genresRouter = require('./routes/genres')
 
 const app = express();
 
@@ -11,9 +9,7 @@ app.use(cors());
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use('/api/v1/authors', authorsRouter);
 app.use('/api/v1/books', bookRouter);
-// app.use('/api/v1/genres', genresRouter)
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });

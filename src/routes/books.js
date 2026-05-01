@@ -1,58 +1,64 @@
 const express = require('express');
-const { Book } = require('../models/Book');
+const Book = require('../models/Book');
 
 const router = express.Router();
 
+// /api/v1/books + endpoint
+
 // Routes
+// http://localhost:3000/api/v1/books/
 router.post('/', async (req, res, next) => {
   try {
-    let book 
-    
-    if(Array.isArray(req.body)){
-      book = await Book.insertMany(req.body, {ordered: false});
-    } else {
-      book = await Book.create(req.body)
-    }
+    let book;
 
+    if (Array.isArray(req.body)) {
+      book = await Book.insertMany(req.body, { ordered: false });
+    } else {
+      book = await Book.create(req.body);
+    }
     res.status(201).json(book);
   } catch (error) {
-    if(error.name === 'ValidationError') { // error.name kommer från schema-valideringen i mongoose
+    if (error.name === 'ValidationError') {
       return res.status(400).json({ error: error.message });
     }
-    if(error.code === 11000){ // error.code kommer från MongoDB
-      return res.status(400).json({error: 'Duplicated ISBN detected'})
+
+    if (error.code === 11000) {
+      return res.status(400).json({ error: `Duplicate ISBN detected` });
     }
-    res.status(500).json({error: 'Server error, could not create book.'})
+    res.status(500).json({ error: `Server error, couln't create book.` });
   }
 });
 
 router.get('/', async (req, res, next) => {
   try {
+    const { author, minYear, sort, page = 1, limit = 10 } = req.query;
 
-    const {author, minYear, sort, page = 1, limit = 10} = req.query
+    //filter
+    const filter = {};
 
-    const filter = {}
+    if (author) {
+      const matchingAuthors = await Author.find({
+        name: new RegExp(author, 'i'),
+      }).select('_id')
 
-    if(author) filter.author = author
-    const year = Number(minYear)
-    if(!isNaN(year)){
-      filter.publishYear = { $gte: year }
+      filter.author = { $in: matchingAuthors.map(a => a._id) };
+    }
+    const year = Number(minYear);
+    if (!isNaN(year)) {
+      filter.publishYear = { $gte: year };
     }
 
-    // Sort
-    const sortOption = sort ? sort : '-createdAt'
+    //sort
+    const sortOption = sort ? sort : '-createdAt';
 
-    // Pagination
-    const pageNum = Math.max(Number(page), 1)
-    const limitNum = Math.min(Number(limit), 100)
-    const skip = (pageNum -1) * limitNum
+    //pagination
+    const pageNum = Math.max(Number(page), 1);
+    const limitNum = Math.min(Number(limit), 100);
+    const skip = (pageNum - 1) * limitNum;
 
-    const books = await Book.find(filter)
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limitNum)
+    const books = await Book.find(filter).populate('author').sort(sortOption).skip(skip).limit(limitNum);
 
-    const total = await Book.countDocuments(filter)
+    const total = await Book.countDocuments(filter);
 
     res.json({
       data: books,
@@ -60,69 +66,70 @@ router.get('/', async (req, res, next) => {
         page: pageNum,
         limit: limitNum,
         total,
-        totalPages: Math.ceil(total / limitNum)
-      }
+        totalPages: Math.ceil(total / limitNum),
+      },
     });
   } catch (error) {
-    res.status(500).json({error: `Could not fetch books`});
+    res.status(500).json({ error: `Couldn't fetch books` });
   }
 });
 
 router.get('/:id', async (req, res, next) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const book = await Book.findById(req.params.id).populate('author', 'name nationality');
 
     if (!book) {
       return res.status(404).json({ message: 'The Book could not be located' });
     }
     res.json(book);
   } catch (error) {
-    if(error.name === 'CastError'){
-      return res.status(404).json({error: 'Invalid id-format'})
+    if (error.name === 'CastError') {
+      return res.status(404).json({ error: `Invalid id-format` });
     }
-    res.status(500).json({error: 'Server error'})
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
+//PATCH - Updating our data in the Databse PATCH vs PUT
 router.patch('/:id', async (req, res) => {
   try {
-    // const book = await Book.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true}) // new: true talar om att vi vill visa den nya datan i svaret, new: false talar om att vi ska visa datan som den var innan den uppdaterades
-    const book = await Book.findByIdAndUpdate(req.params.id, req.body, {returnDocument: 'after', runValidators: true}) // returnDocument: 'after' talar om att vi vill visa den nya datan i svaret, annars anger man "before"
-    if(!book) {
-      return res.status(404).json({error: 'Book could not be located'})
+    const book = await Book.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after', runValidators: true });
+    if (!book) {
+      return res.status(404).json({ error: `Book couldn't be located` });
     }
-    
-    res.json(book)
-  } catch(error) {
-    if(error.name === 'ValidationError'){
-      return res.status(400).json({error: error.message})
-    }
-    if(error.name === 'CastError'){
-      if(error.path === '_id'){
-        return res.status(404).json({error: 'Invalid id-format'})
-      }
-      return res.status(400).json({error: `Invalid value for ${error.path}`})
-    }
-    res.status(500).json({error: `Could not update selected book`})
-  }
-})
 
-// Delete
+    res.json(book);
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: error.message });
+    }
+
+    if (error.name === 'CastError') {
+      if (error.path === '_id') {
+        return res.status(404).json({ error: `Invalid id-format` });
+      }
+      return res.status(400).json({ error: `Invalid value for ${error.path}` });
+    }
+    res.status(500).json({ error: `Couldnt update selected book` });
+  }
+});
+
+//DELETE - remove data from databse
 router.delete('/:id', async (req, res) => {
   try {
-    const book = await Book.findByIdAndDelete(req.params.id)
+    const book = await Book.findByIdAndDelete(req.params.id);
 
-    if(!book) {
-      return res.status(404).json({error: `Could not locate requested book`})
+    if (!book) {
+      return res.status(404).json({ error: `Couldn't located requested book` });
     }
 
-    res.status(204).send()
-  } catch(error) {
-    if(error.name === 'CastError'){
-      return res.status(404).json({error: 'Invalid id-format'})
+    res.status(204).send();
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(404).json({ error: `Invalid id-format` });
     }
-    res.status(500).json({error: 'A server error occured. Deletion operation aborted'})
+    res.status(500).json({ error: `A server error occured. Deletation operation aborted.` });
   }
-})
+});
 
 module.exports = router;
